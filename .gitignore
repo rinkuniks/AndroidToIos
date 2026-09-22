@@ -1,0 +1,18 @@
+# Rust
+target/
+**/target/
+*.rs.bk
+*.json.tmp
+
+# Node / desktop (Phase 8)
+node_modules/
+dist/
+
+# IDE / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Local logs
+*.log
