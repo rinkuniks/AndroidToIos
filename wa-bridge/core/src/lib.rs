@@ -5,8 +5,12 @@
 //! (native bindings). Scope locks L1–L8 apply (see repo README).
 
 pub mod checkpoint;
+pub mod engine;
 pub mod error;
 pub mod manifest;
 pub mod transport;
 
 pub use error::{Error, Result};
+pub use manifest::*;
+pub use transport::*;
+

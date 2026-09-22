@@ -89,7 +89,7 @@ impl Manifest {
         chunk_size: u32,
     ) -> &mut Object {
         // div_ceil needs Rust >= 1.73; use the portable formula instead.
-        let chunk_count = (size + chunk_size as u64 - 1) / chunk_size as u64;
+        let chunk_count = size.div_ceil(chunk_size as u64);
         self.objects.push(Object {
             id,
             category,

@@ -30,4 +30,21 @@ pub enum Error {
 
     #[error("session is in state {state}; operation not permitted")]
     InvalidState { state: String },
+
+    #[error("source read error for object {object_id}")]
+    SourceRead {
+        object_id: String,
+        #[source]
+        source: std::io::Error,
+    },
+
+    #[error("hash mismatch for object {object_id}")]
+    HashMismatch { object_id: String },
+
+    #[error("size mismatch for object {object_id}")]
+    SizeMismatch { object_id: String },
+
+    #[error("engine error: {0}")]
+    Engine(String),
 }
+
