@@ -1,0 +1,51 @@
+name: core-ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+# Phase 1 exit gate: "CI green on all dev machines".
+jobs:
+  rust-core:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    defaults:
+      run:
+        working-directory: wa-bridge/core
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt, clippy
+
+      - name: Cache cargo registry and target
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            wa-bridge/core/target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('wa-bridge/core/Cargo.lock') }}
+          restore-keys: ${{ runner.os }}-cargo-
+
+      - name: Formatting
+        run: cargo fmt --all -- --check
+
+      - name: Clippy (warnings are errors)
+        run: cargo clippy --all-targets -- -D warnings
+
+      - name: Tests (unit + integration)
+        run: cargo test --verbose
+
+      # Slow benchmarks are #[ignore]d; run them so throughput regressions surface.
+      - name: Throughput baselines
+        run: cargo test --release --test throughput_bench -- --ignored --nocapture
+
+      - name: Chaos / interruption harness
+        run: cargo test --release --test interruption_chaos

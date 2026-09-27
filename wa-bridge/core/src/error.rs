@@ -11,10 +11,7 @@ pub enum Error {
     Transport(String),
 
     #[error("integrity mismatch: object {object_id} chunk {chunk_index}")]
-    IntegrityMismatch {
-        object_id: String,
-        chunk_index: u64,
-    },
+    IntegrityMismatch { object_id: String, chunk_index: u64 },
 
     #[error("checkpoint store error: {0}")]
     Checkpoint(String),
@@ -31,6 +28,9 @@ pub enum Error {
     #[error("session is in state {state}; operation not permitted")]
     InvalidState { state: String },
 
+    #[error("illegal session transition: {from} -> {to}")]
+    InvalidTransition { from: String, to: String },
+
     #[error("source read error for object {object_id}")]
     SourceRead {
         object_id: String,
@@ -46,5 +46,15 @@ pub enum Error {
 
     #[error("engine error: {0}")]
     Engine(String),
-}
 
+    /// Crypto failures never carry key material, plaintext, or nonces (L7).
+    /// The message is a static description, so no dynamic data can leak here.
+    #[error("crypto error: {0}")]
+    Crypto(&'static str),
+
+    #[error("unsupported key version {found} (this build supports {supported})")]
+    UnsupportedKeyVersion { found: u8, supported: u8 },
+
+    #[error("wrong key purpose: frame is {found} but {expected} was used")]
+    WrongKeyPurpose { found: String, expected: String },
+}

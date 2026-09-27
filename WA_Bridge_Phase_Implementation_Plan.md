@@ -3,7 +3,8 @@
 **Document version:** 1.0
 **Implements:** `WA_Bridge_Production_Roadmap_v1.2.md` (scope authority) + `WA_Bridge_Risk_Register_v1.0.md` (risk gates)
 **Technical reference:** `WA_Bridge_Production_Roadmap_v1.1-1.md` Technical Appendix (architecture, protocol, stack — still valid wherever v1.2 does not override)
-**Status:** Planning — no code scaffolded yet
+**Status:** Phase 0 in progress (blocked on hardware); Phase 1 core substantially
+implemented (crypto, resume, chaos harness, CI); Phases 2–13 scaffold-only.
 
 ---
 
@@ -95,10 +96,10 @@ Same-Wi-Fi secure transfer · QR pairing fallback · Direct USB-C app-to-app dat
 - Property/unit tests + interruption-injection harness (kill at 25/50/90%, corrupt chunks, network change)
 
 **Exit gate:**
-- [ ] 20–100 GB synthetic datasets over loopback + real Wi-Fi; resume from last verified chunk after app kill, process restart, simulated network drop
-- [ ] Zero silent corruption: every resumed object hash-verifies
-- [ ] Throughput baseline recorded (feeds H5 ETA work)
-- [ ] CI green on all dev machines; fuzz seeds prepared for Phase 10
+- [~] 20–100 GB synthetic datasets over loopback + real Wi-Fi; resume from last verified chunk after app kill, process restart, simulated network drop — **done:** simulated kill / network drop / corruption with mid-object resume in `core/tests/interruption_chaos.rs` (25/50/90%). **Outstanding:** real Wi-Fi transport, 20–100 GB datasets
+- [x] Zero silent corruption: every resumed object hash-verifies — per-chunk Level 1 + staged-object Level 2 verification; mid-object resume across processes now works (ADR-006/007)
+- [x] Throughput baseline recorded (feeds H5 ETA work) — 112 MB/s at 50 MB / 4 MiB chunks over loopback (gate: >10 MB/s)
+- [~] CI green on all dev machines; fuzz seeds prepared for Phase 10 — workflow added (`.github/workflows/ci.yml`: fmt + clippy `-D warnings` + tests + benches, Linux/Windows/macOS); fuzz seeds outstanding
 
 **Risks addressed:** H3 (primary); C2 (consumes verdict); H5.
 

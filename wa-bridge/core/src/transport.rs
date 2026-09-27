@@ -8,8 +8,6 @@ use async_trait::async_trait;
 use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::sync::mpsc;
 
-
-
 /// Discovery record for a peer device.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct PeerInfo {
@@ -65,7 +63,7 @@ pub trait Transport: Send + Sync {
 
     async fn health(&self) -> Result<LinkHealth>;
 
-        /// Attempt transparent reconnection; on success the session resumes from
+    /// Attempt transparent reconnection; on success the session resumes from
     /// the last verified checkpoint.
     async fn reconnect(&mut self) -> Result<()>;
 
@@ -102,14 +100,30 @@ impl FaultHandle {
 }
 
 /// Create two connected loopback endpoints + a shared fault handle.
-pub fn loopback_pair(peer_a: PeerInfo, peer_b: PeerInfo) -> (LoopbackTransport, LoopbackTransport, FaultHandle) {
+pub fn loopback_pair(
+    peer_a: PeerInfo,
+    peer_b: PeerInfo,
+) -> (LoopbackTransport, LoopbackTransport, FaultHandle) {
     let (tx_a, rx_a) = mpsc::unbounded_channel();
     let (tx_b, rx_b) = mpsc::unbounded_channel();
-        let broken = std::sync::Arc::new(AtomicBool::new(false));
-    let a = LoopbackTransport { tx: tx_b, rx: rx_a, peer: peer_a, connected: true, broken: broken.clone() };
-    let b = LoopbackTransport { tx: tx_a, rx: rx_b, peer: peer_b, connected: true, broken: broken.clone() };
+    let broken = std::sync::Arc::new(AtomicBool::new(false));
+    let a = LoopbackTransport {
+        tx: tx_b,
+        rx: rx_a,
+        peer: peer_a,
+        connected: true,
+        broken: broken.clone(),
+    };
+    let b = LoopbackTransport {
+        tx: tx_a,
+        rx: rx_b,
+        peer: peer_b,
+        connected: true,
+        broken: broken.clone(),
+    };
     let fault = FaultHandle { broken };
-    let mut a = a; a.broken = fault.broken.clone();
+    let mut a = a;
+    a.broken = fault.broken.clone();
     (a, b, fault)
 }
 
@@ -203,7 +217,8 @@ mod tests {
 
     #[tokio::test]
     async fn loopback_roundtrips_and_cut_breaks_send() {
-                let (mut a, mut b, fault) = loopback_pair(peer(PeerPlatform::Android), peer(PeerPlatform::Iphone));
+        let (mut a, mut b, fault) =
+            loopback_pair(peer(PeerPlatform::Android), peer(PeerPlatform::Iphone));
 
         let chunk = Chunk {
             object_id: "o".into(),
@@ -219,11 +234,21 @@ mod tests {
 
         // Cutting the link makes the next send fail until reconnect.
         fault.cut();
-        let cut_chunk = Chunk { object_id: "o".into(), sequence: 1, data: b"x".into() };
+        let cut_chunk = Chunk {
+            object_id: "o".into(),
+            sequence: 1,
+            data: b"x".into(),
+        };
         assert!(a.send_chunk(cut_chunk).await.is_err());
         a.reconnect().await.unwrap();
-        let ack = a.send_chunk(Chunk { object_id: "o".into(), sequence: 2, data: b"x".into() }).await.unwrap();
+        let ack = a
+            .send_chunk(Chunk {
+                object_id: "o".into(),
+                sequence: 2,
+                data: b"x".into(),
+            })
+            .await
+            .unwrap();
         assert_eq!(ack.sequence, 2);
     }
 }
-

@@ -17,7 +17,9 @@ use std::sync::Arc;
 use std::time::Instant;
 
 use wa_bridge_core::checkpoint;
-use wa_bridge_core::engine::{MediaSource, ObjectSink, ProgressSink, Receiver, Sender, DEFAULT_MAX_RETRIES};
+use wa_bridge_core::engine::{
+    MediaSource, ObjectSink, ProgressSink, Receiver, Sender, DEFAULT_MAX_RETRIES,
+};
 use wa_bridge_core::manifest::{Category, Manifest};
 use wa_bridge_core::transport::{FaultHandle, PeerInfo, PeerPlatform};
 use wa_bridge_core::{loopback_pair, Object};
@@ -33,12 +35,20 @@ struct BenchSource {
 }
 
 impl MediaSource for BenchSource {
-    fn read_at(&mut self, object: &Object, sequence: u64, buf: &mut [u8]) -> std::io::Result<usize> {
-        let all = self.data.get(&object.id).ok_or_else(|| {
-            std::io::Error::new(std::io::ErrorKind::NotFound, object.id.clone())
-        })?;
+    fn read_at(
+        &mut self,
+        object: &Object,
+        sequence: u64,
+        buf: &mut [u8],
+    ) -> std::io::Result<usize> {
+        let all = self
+            .data
+            .get(&object.id)
+            .ok_or_else(|| std::io::Error::new(std::io::ErrorKind::NotFound, object.id.clone()))?;
         let off = (sequence as usize) * (object.chunk_size as usize);
-        if off >= all.len() { return Ok(0); }
+        if off >= all.len() {
+            return Ok(0);
+        }
         let end = (off + buf.len()).min(all.len());
         buf[..end - off].copy_from_slice(&all[off..end]);
         Ok(end - off)
@@ -58,11 +68,25 @@ impl ObjectSink for BenchSink {
         let off = (sequence as usize) * cs;
         let need = off + data.len();
         let v = self.staged.entry(object_id.to_string()).or_default();
-        if v.len() < need { v.resize(need, 0); }
+        if v.len() < need {
+            v.resize(need, 0);
+        }
         v[off..need].copy_from_slice(data);
         Ok(())
     }
-    fn complete_object(&mut self, _object_id: &str) -> std::io::Result<()> { Ok(()) }
+    fn complete_object(&mut self, _object_id: &str) -> std::io::Result<()> {
+        Ok(())
+    }
+
+    fn verify_object(&mut self, object_id: &str, expected_sha256: &str) -> std::io::Result<bool> {
+        let staged = match self.staged.get(object_id) {
+            Some(s) => s,
+            None => return Ok(false),
+        };
+        let actual = checkpoint::sha256_streaming(&mut Cursor::new(staged))
+            .map_err(|e| std::io::Error::other(e.to_string()))?;
+        Ok(actual == expected_sha256)
+    }
 }
 
 /// Progress sink that records chunks verified + reconnects; optionally cuts the link.
@@ -111,13 +135,13 @@ fn build_manifest(
         let o = m.add_object(id.to_string(), *cat, *size, chunk_size);
         o.content_hash = hash;
         data.insert(id.to_string(), bytes);
-                cs.insert(id.to_string(), chunk_size);
+        cs.insert(id.to_string(), chunk_size);
     }
     let sink = BenchSink {
         cs,
         staged: HashMap::new(),
     };
-        (m, BenchSource { data }, sink)
+    (m, BenchSource { data }, sink)
 }
 
 /// Run a full E2E transfer over a fresh loopback pair.
@@ -137,7 +161,7 @@ async fn run_transfer(
         peer("B", PeerPlatform::Iphone),
     );
 
-        let mut cp = CountingProgress {
+    let mut cp = CountingProgress {
         verified: verified.clone(),
         reconnects: reconnects.clone(),
         fault: fh.clone(),
@@ -180,19 +204,31 @@ fn verify_integrity(manifest: &Manifest, sink: &BenchSink) {
     for obj in &manifest.objects {
         let staged = sink.staged.get(&obj.id).expect("object should be in sink");
         let hash = checkpoint::sha256_streaming(&mut Cursor::new(staged)).unwrap();
-        assert_eq!(hash, obj.content_hash, "hash mismatch for object {}", obj.id);
-        assert_eq!(staged.len() as u64, obj.size, "size mismatch for {}", obj.id);
-        }
+        assert_eq!(
+            hash, obj.content_hash,
+            "hash mismatch for object {}",
+            obj.id
+        );
+        assert_eq!(
+            staged.len() as u64,
+            obj.size,
+            "size mismatch for {}",
+            obj.id
+        );
+    }
 }
 
 /// Quick smoke test that verifies the bench harness works (runs by default).
 #[tokio::test]
 async fn throughput_smoke_test() {
     let (manifest, mut src, mut sink) = build_manifest(
-        &[("s1", Category::Image, 4096u64), ("s2", Category::Audio, 8192)],
+        &[
+            ("s1", Category::Image, 4096u64),
+            ("s2", Category::Audio, 8192),
+        ],
         1024,
     );
-        let (_, _, mbps, _) = run_transfer(&manifest, &mut src, &mut sink, 0).await;
+    let (_, _, mbps, _) = run_transfer(&manifest, &mut src, &mut sink, 0).await;
     verify_integrity(&manifest, &sink);
     println!("Smoke test: {:.1} MB/s", mbps);
 }
@@ -207,7 +243,9 @@ async fn throughput_benchmarks() {
     let mut results: Vec<(String, u32, u64, f64, u128, u64)> = Vec::new();
 
     let sizes_small: &[(&str, Category, u64)] = &[
-        ("o0", Category::Image, 300), ("o1", Category::Video, 300), ("o2", Category::Image, 256),
+        ("o0", Category::Image, 300),
+        ("o1", Category::Video, 300),
+        ("o2", Category::Image, 256),
     ];
     let sizes_med: &[(&str, Category, u64)] = &[
         ("o0", Category::Image, 128 * 1024),
@@ -226,18 +264,27 @@ async fn throughput_benchmarks() {
         for &cs in &chunk_sizes {
             // Skip tiny chunk sizes for huge objects (would create tens of thousands of chunks)
             let skip = sizes.iter().any(|(_, _, s)| *s >= 1_000_000) && cs < 64 * 1024;
-            if skip { continue; }
+            if skip {
+                continue;
+            }
 
             let (manifest, mut src, mut sink) = build_manifest(sizes, cs);
 
             // Warm-up (not measured)
-            let (_, _, _, _) = run_transfer(&manifest, &mut src.clone(), &mut BenchSink {
-                cs: sink.cs.clone(),
-                staged: HashMap::new(),
-            }, 0).await;
+            let (_, _, _, _) = run_transfer(
+                &manifest,
+                &mut src.clone(),
+                &mut BenchSink {
+                    cs: sink.cs.clone(),
+                    staged: HashMap::new(),
+                },
+                0,
+            )
+            .await;
 
             // Measured run
-            let (bytes, reconnects, mbps, ms) = run_transfer(&manifest, &mut src, &mut sink, 0).await;
+            let (bytes, reconnects, mbps, ms) =
+                run_transfer(&manifest, &mut src, &mut sink, 0).await;
             results.push((label.to_string(), cs, bytes, mbps, ms, reconnects));
             println!(
                 "{:<30} | cs={:>8} | {:>10.0} B | {:>8.1} ms | {:>8.1} MB/s | reconnects={}",
@@ -289,10 +336,17 @@ async fn throughput_benchmarks() {
         .map(|r| r.3);
 
     if let Some(mbps) = best_50mb {
-        println!("\n50MB transfer throughput: {:.1} MB/s (gate: >10 MB/s)", mbps);
-        assert!(mbps > 10.0, "50MB loopback transfer fell below 10 MB/s performance gate");
+        println!(
+            "\n50MB transfer throughput: {:.1} MB/s (gate: >10 MB/s)",
+            mbps
+        );
+        assert!(
+            mbps > 10.0,
+            "50MB loopback transfer fell below 10 MB/s performance gate"
+        );
     }
 
-    println!("\n✅ All throughput baselines captured, integrity verified, performance gate passed.");
+    println!(
+        "\n✅ All throughput baselines captured, integrity verified, performance gate passed."
+    );
 }
-

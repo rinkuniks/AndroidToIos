@@ -15,5 +15,12 @@ uuid = { version = "1", features = ["v4", "serde"] }
 async-trait = "0.1"
 tokio = { version = "1", features = ["rt-multi-thread", "macros", "sync", "time"] }
 
+# Crypto (Plan Phase 1: AEAD framing, Argon2id KDF, key versioning)
+aes-gcm = { version = "0.10", features = ["std"] }
+argon2 = "0.5"
+zeroize = { version = "1", features = ["derive"] }
+getrandom = "0.2"
+
 [dev-dependencies]
 tempfile = "3"
+async-trait = "0.1"
