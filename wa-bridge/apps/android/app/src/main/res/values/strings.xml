@@ -1,0 +1,64 @@
+<resources>
+
+    <!-- App name & basic string resources -->
+    <string name="app_name">WA Bridge</string>
+    <string name="app_name_debug">WA Bridge (Debug)</string>
+
+    <!-- Screen 1 — Welcome -->
+    <string name="welcome_title">WA Bridge</string>
+    <string name="welcome_subtitle">Transfer WhatsApp media to your iPhone or iPad</string>
+    <string name="welcome_cta">Get Started</string>
+
+    <!-- Screen 2 — Direction -->
+    <string name="direction_title">Transfer Direction</string>
+    <string name="direction_source">This is my Android device</string>
+    <string name="direction_destination">This is my iPhone / iPad</string>
+
+    <!-- Screen 3 — Destination Status -->
+    <string name="dest_status_title">Find Your Destination</string>
+    <string name="dest_status_scanning">Scanning for iPhone/iPad devices…</string>
+    <string name="dest_status_not_found">No iPhone or iPad found nearby.</string>
+    <string name="dest_status_retry">Scan Again</string>
+
+    <!-- Screen 4 — Connect -->
+    <string name="connect_title">Ready to Connect</string>
+    <string name="connect_instructions">On your iPhone/iPad, open the WA Bridge receiver and tap to pair.</string>
+    <string name="connect_waiting">Waiting for connection…</string>
+    <string name="connect_verifying">Verifying connection…</string>
+
+    <!-- Screen 5 — Ready Check -->
+    <string name="ready_check_title">Ready Check</string>
+    <string name="ready_check_vault">Secure Vault: %1$s of %2$s items</string>
+    <string name="ready_check_wifi">Wi-Fi: %1$s</string>
+    <string name="ready_check_battery">Battery: %1$s%%</string>
+    <string name="ready_check_storage">Available Storage: %1$s</string>
+    <string name="ready_check_start">Start Transfer</string>
+
+    <!-- Transfer progress -->
+    <string name="transfer_title">Transferring…</string>
+    <string name="transfer_progress">%1$s / %2$s — %3$.1f%%</string>
+    <string name="transfer_speed">%1$.1f MB/s</string>
+    <string name="transfer_paused">Transfer paused</string>
+    <string name="transfer_resumed">Transfer resumed</string>
+
+    <!-- Inventory / Vault -->
+    <string name="vault_scanning">Scanning WhatsApp media…</string>
+    <string name="vault_complete">Vault ready: %1$s items, %2$s</string>
+    <string name="vault_empty">No accessible WhatsApp media found.</string>
+    <string name="vault_size">%1$.1f MB</string>
+
+    <!-- Errors -->
+    <string name="error_no_wifi">Wi-Fi must be enabled for transfer.</string>
+    <string name="error_low_battery">Low battery. Charge your device before transferring.</string>
+    <string name="error_insufficient_storage">Not enough storage for the transfer.</string>
+    <string name="error_connection_lost">Connection lost. Tap to retry.</string>
+    <string name="error_hashing_mismatch">Hash mismatch during verification.</string>
+
+    <!-- Foreground service notification -->
+    <string name="notification_channel_transfer">Transfers</string>
+    <string name="notification_channel_inventory">Inventory</string>
+    <string name="notification_transfer_title">WA Bridge is transferring</string>
+    <string name="notification_transfer_text">%1$s of %2$s</string>
+    <string name="notification_scan_title">WA Bridge is scanning</string>
+    <string name="notification_scan_text">Building your secure vault…</string>
+</resources>

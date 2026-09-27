@@ -1,0 +1,21 @@
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- App theme: Material 3, dynamic color from Android 12+ -->
+
+    <style name="Theme.Wabridge" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="colorPrimary">@color/md_theme_primary</item>
+        <item name="colorPrimaryVariant">@color/md_theme_primaryVariant</item>
+        <item name="colorOnPrimary">@color/md_theme_onPrimary</item>
+        <item name="colorSecondary">@color/md_theme_secondary</item>
+        <item name="colorSecondaryVariant">@color/md_theme_secondaryVariant</item>
+        <item name="android:windowLightStatusBar">true</item>
+        <item name="android:statusBarColor">?attr/colorPrimary</item>
+        <item name="android:navigationBarColor">?attr/colorSurface</item>
+    </style>
+
+    <style name="Theme.Wabridge.NoActionBar" parent="Theme.Wabridge">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+</resources>
