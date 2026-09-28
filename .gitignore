@@ -8,6 +8,15 @@ target/
 node_modules/
 dist/
 
+# Android
+local.properties
+.gradle/
+build/
+*.apk
+*.aab
+# Native (CMake/NDK) intermediate output
+.cxx/
+
 # IDE / OS
 .vscode/
 .idea/

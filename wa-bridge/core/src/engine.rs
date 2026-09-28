@@ -22,12 +22,16 @@ pub const MANIFEST_OBJECT_ID: &str = "wa-bridge/manifest/v1";
 pub const DEFAULT_MAX_RETRIES: u32 = 3;
 
 /// Source of object bytes for the sender (Android reads from SAF/database).
-pub trait MediaSource {
+///
+/// `Send` for the same reason as [`ProgressSink`]: the real implementation is a
+/// JNI/FFI-backed reader driven from a worker thread, and the transfer future
+/// must stay spawnable.
+pub trait MediaSource: Send {
     fn read_at(&mut self, object: &Object, sequence: u64, buf: &mut [u8])
         -> std::io::Result<usize>;
 }
 /// Sink that stages received object bytes (iOS/iPadOS writes to a staging dir).
-pub trait ObjectSink {
+pub trait ObjectSink: Send {
     fn write_chunk(&mut self, object_id: &str, sequence: u64, data: &[u8]) -> std::io::Result<()>;
     fn complete_object(&mut self, object_id: &str) -> std::io::Result<()>;
     /// Re-read the staged object in sequence order and confirm its SHA-256.
@@ -39,7 +43,12 @@ pub trait ObjectSink {
     fn verify_object(&mut self, object_id: &str, expected_sha256: &str) -> std::io::Result<bool>;
 }
 /// Progress + checkpoint callbacks. All methods are no-ops by default.
-pub trait ProgressSink {
+///
+/// The trait requires [`Send`] because both real callers hand a sink across a
+/// thread boundary: Android calls in from a JNI/foreground-service worker and
+/// iOS from a background actor. Without the bound the whole transfer future
+/// becomes non-`Send` and cannot be spawned on a multi-thread runtime.
+pub trait ProgressSink: Send {
     fn on_object_progress(&mut self, _object_id: &str, _bytes: u64, _size: u64) {}
     fn on_object_complete(&mut self, _object_id: &str) {}
     fn on_chunk_verified(&mut self, _object_id: &str, _sequence: u64) {}

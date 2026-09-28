@@ -9,8 +9,9 @@
     - No auto-erase of source (L6).
 -->
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.wabridge.source">
+<!-- The package/applicationId is declared in app/build.gradle.kts (namespace).
+     Do not re-add a package= attribute here; AGP 8 ignores it. -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <!-- Wi-Fi peer discovery + multicast (default: Wi-Fi direct / local network) -->
@@ -31,6 +32,7 @@
         android:name=".WabridgeApp"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:label="@string/app_name"
         android:theme="@style/Theme.Wabridge">
 
@@ -55,7 +57,7 @@
         <!-- Document provider for SAF (media selection) -->
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationInfo.packageName}.fileprovider"
+            android:authorities="${applicationId}.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true" />
     </application>

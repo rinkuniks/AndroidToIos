@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Night overrides: SAME names as values/colors.xml so the DayNight
+         theme swaps them automatically. -->
+    <color name="md_theme_primary">#90CAF9</color>
+    <color name="md_theme_onPrimary">#003366</color>
+    <color name="md_theme_primaryContainer">#00497D</color>
+    <color name="md_theme_onPrimaryContainer">#D1E4FF</color>
+    <color name="md_theme_secondary">#53D7F0</color>
+    <color name="md_theme_onSecondary">#003640</color>
+    <color name="md_theme_secondaryContainer">#004E5A</color>
+    <color name="md_theme_onSecondaryContainer">#9FF0FF</color>
+    <color name="md_theme_surface">#141218</color>
+    <color name="md_theme_onSurface">#E6E0E9</color>
+    <color name="md_theme_surfaceVariant">#49454F</color>
+    <color name="md_theme_onSurfaceVariant">#CAC4D0</color>
+    <color name="md_theme_error">#FFB4AB</color>
+    <color name="md_theme_onError">#690005</color>
+    <color name="md_theme_outline">#938F99</color>
+    <color name="md_theme_surfaceContainerLow">#1D1B20</color>
+</resources>

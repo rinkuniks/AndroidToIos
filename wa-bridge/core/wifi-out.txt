@@ -1,0 +1,7 @@
+
+running 7 tests
+test discovery_finds_an_advertised_peer ... ok
+test discovery_reports_nothing_on_a_quiet_network ... ok
+test end_to_end_transfer_over_real_tcp_verifies_every_object ... TCP loopback: 1237494 bytes/s, rtt 2 ms
+ok
+test pairs_over_real_tcp_and_roundtrips_a_chunk ... 

@@ -5,6 +5,7 @@
 
 use crate::{Error, Result};
 use async_trait::async_trait;
+use serde::{Deserialize, Serialize};
 use std::sync::atomic::{AtomicBool, Ordering};
 use tokio::sync::mpsc;
 
@@ -16,7 +17,8 @@ pub struct PeerInfo {
     pub addresses: Vec<String>,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
 pub enum PeerPlatform {
     Android,
     Iphone,

@@ -225,7 +225,7 @@ class InventoryEngine(private val context: Context) {
             val name = queryDisplayName(uri) ?: "file-${System.currentTimeMillis()}"
             val size = queryFileSize(uri)
             val mime = context.contentResolver.getType(uri) ?: "application/octet-stream"
-            val category = categorizeByMime(mime) ?: return@mapNotNull
+            val category = categorizeByMime(mime) ?: return@mapNotNull null
 
             MediaItem(
                 id = "saf://$uri",

@@ -47,6 +47,12 @@ pub enum Error {
     #[error("engine error: {0}")]
     Engine(String),
 
+    #[error("protocol error: {0}")]
+    Protocol(String),
+
+    #[error("pairing rejected: the code did not match, or the peer could not verify it")]
+    PairingRejected,
+
     /// Crypto failures never carry key material, plaintext, or nonces (L7).
     /// The message is a static description, so no dynamic data can leak here.
     #[error("crypto error: {0}")]

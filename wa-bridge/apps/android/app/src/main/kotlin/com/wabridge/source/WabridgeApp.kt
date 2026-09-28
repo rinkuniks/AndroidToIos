@@ -2,15 +2,13 @@ package com.wabridge.source
 
 import android.app.Application
 import android.util.Log
-import androidx.lifecycle.ProcessLifecycleOwner
-import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class WabridgeApp : Application() {
-    val transferState: StateFlow<TransferState> = MutableStateFlow(TransferState.Idle)
+    val transferState: StateFlow<TransferState> = MutableStateFlow(TransferStates.Idle)
         .asStateFlow()
 
     private val _uiState = MutableStateFlow(UiState())
@@ -47,7 +45,11 @@ data class TransferState(
     val reconnectCount: Int = 0,
 )
 
-object TransferState {
+/**
+ * Canonical states for a transfer. (Named `TransferStates` to avoid clashing
+ * with the [TransferState] data class above.)
+ */
+object TransferStates {
     val Idle = TransferState(isActive = false, status = "Idle")
     val Scanning = TransferState(isActive = true, status = "Scanning for devices")
     val Connecting = TransferState(isActive = true, status = "Connecting")

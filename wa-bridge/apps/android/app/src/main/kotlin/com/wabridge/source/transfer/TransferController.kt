@@ -100,7 +100,7 @@ class TransferController {
      */
     fun createTestPair(): String = TransferController_nativeCreateTestPair()
 
-    private fun <T> wrapCall(block: suspend () -> T): Result<T> {
+    private suspend fun <T> wrapCall(block: suspend () -> T): Result<T> {
         return try {
             Result.success(block())
         } catch (e: Exception) {

@@ -142,6 +142,11 @@ pub fn random_key() -> Result<SecretKey> {
     Ok(SecretKey(os_random::<KEY_LEN>()?))
 }
 
+/// Draw `N` bytes from the OS CSPRNG (session ids, handshake nonces, salts).
+pub fn random_bytes<const N: usize>() -> Result<[u8; N]> {
+    os_random::<N>()
+}
+
 /// Generate a fresh KDF salt from the OS CSPRNG.
 pub fn random_salt() -> Result<[u8; SALT_LEN]> {
     os_random::<SALT_LEN>()

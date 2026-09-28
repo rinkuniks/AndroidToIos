@@ -9,11 +9,14 @@ pub mod crypto;
 pub mod engine;
 pub mod error;
 pub mod manifest;
+pub mod protocol;
 pub mod session;
 pub mod transport;
+pub mod wifi;
 
 pub use crypto::{KeyPurpose, SecretKey};
 pub use error::{Error, Result};
 pub use manifest::*;
+pub use protocol::{Frame, FrameKind};
 pub use session::Session;
 pub use transport::*;
